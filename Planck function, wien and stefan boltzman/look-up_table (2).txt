@@ -1,0 +1,52 @@
+function create_lookup_table(filename, lambda_min, lambda_max, emissivity, T_min, T_max, T_step)
+    % Constants
+    h = 6.626e-34; % Planck constant (J*s)
+    c = 3e8; % Speed of light (m/s)
+    k = 1.381e-23; % Boltzmann constant (J/K)
+    
+    % Planck function
+    planck_func = @(lambda, T) (2 * h * c^2) ./ (lambda.^5) ./ (exp((h * c) ./ (lambda * k * T)) - 1);
+    
+    % Function to integrate Planck function over the given wavelength range
+    integrate_planck = @(T) integral(@(lambda) planck_func(lambda, T), lambda_min, lambda_max);
+    
+    % Temperature range
+    temperatures = T_min:T_step:T_max;
+    radiance_values = zeros(size(temperatures));
+    
+    % Calculate radiance for each temperature
+    for i = 1:length(temperatures)
+        T = temperatures(i);
+        radiance_values(i) = emissivity * integrate_planck(T);
+    end
+    
+    % Save to file
+    save(filename, 'temperatures', 'radiance_values');
+end
+
+% Create look-up table
+create_lookup_table('lookup_table.mat', 3e-6, 5e-6, 0.9, 200, 2000, 10);
+
+
+
+% sicaklık bulma fonksiyonu
+function T = find_temperature_with_lookup(radiance_target, emittance, lookup_table_file)
+    % Load lookup table
+    data = load(lookup_table_file);
+    temperatures = data.temperatures;
+    radiance_values = data.radiance_values;
+    
+    % Adjust target radiance with emittance
+    adjusted_radiance_target = radiance_target / emittance;
+    
+    % Interpolate to find the corresponding temperature
+    T = interp1(radiance_values, temperatures, adjusted_radiance_target, 'linear');
+end
+
+
+% ornek
+radiance_target = 1e5; % Target radiance in W/m^2
+emittance = 1; % Emittance value
+
+T = find_temperature_with_lookup(radiance_target, emittance, 'lookup_table.mat');
+disp(T);

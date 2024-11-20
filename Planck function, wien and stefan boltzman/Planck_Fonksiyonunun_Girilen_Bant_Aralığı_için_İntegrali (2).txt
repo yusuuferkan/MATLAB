@@ -1,0 +1,36 @@
+function radiance = dalgaboyu_integral(T, lambda)
+    % sabitler
+    h = 6.626e-34; % Planck sabiti J*s = 6.626*10^-34
+    c = 3e8; % ısık hızı m*s = 3*10^8
+    k = 1.381e-23; % Boltzmann sabiti J/K = 1.381*10^-23
+    
+    % plank fonksiyonu
+    radiance = (2 * h * c^2) ./ (lambda.^5) ./ (exp((h * c) ./ (lambda * k * T)) - 1);
+end
+
+
+
+
+% ornek
+T = 500; % sıcaklık
+lambda = 5e-6; % dalgaboyu mikro
+
+radiance = dalgaboyu_integral(T, lambda);
+disp(radiance);
+   
+
+
+function radiance = dalgaboyu_integral(T, lambda)
+    % sabitler
+    c1 = 1.911042e8;
+    c2 = 1.438775e4;
+    
+    % plank fonksiyonu
+    radiance = ((c1 ./ (lambda.^5)) ./ (exp(c2 ./ (lambda * T)) - 1);
+end
+
+T = 500; % sıcaklık
+lambda = 5e-6; % dalgaboyu mikro
+
+radiance = dalgaboyu_integral(T, lambda);
+disp(radiance);

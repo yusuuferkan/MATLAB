@@ -1,0 +1,32 @@
+clear; clc; close all;
+% sabitler
+% h = 6.626e-34; % Planck sabiti J*s = 6.626*10^-34
+% c = 3e8; % ısık hızı m*s = 3*10^8
+% k = 1.381e-23; % Boltzmann sabiti J/K = 1.381*10^-23
+c1 = 3.7418e4;
+c2 = 1.4388e4;
+lambda = linspace(0.1, 14, 1000); % dalboyu aralığı
+
+temperatures = [300, 400, 500, 600]; % sıcaklık
+
+figure; % sekil olusturma 
+hold on; % sekli ekranda tutuyoruz ust uste yazcagımız icin
+
+% her sıccaklıga planck fonksiyonu ciziyoruz
+for T = temperatures % her sıcaklığa dongu baslıyor
+    B = (c1 ./ (lambda.^5)) ./ (exp(c2 ./ (lambda * T)) - 1); % planks fonskiyonu
+    plot(lambda, B, 'DisplayName', sprintf('%dK', T)); % mikrometreye cevirme
+
+end
+
+xlabel('Dalga boyu (mikrometre)'); % x e etiket ekleme
+ylabel('Spectral Radiance (W/cm^2/sr/m)');
+title('Planck Blackbody'); 
+legend;
+grid on; % ızgara cizgileri
+hold off; % ekranda tutma modu kapatılıyor
+
+
+python .\inference_batch.py --input_folder .\all --output_folder .\output --checkpoint .\translation_weights.pt --synchronized --output_only --config .\configs\tir2rgb_folder.yaml
+
+python .\inference_batch.py --input_folder .\all --output_folder .\output --checkpoint .\translation_weights.pt -- num_style 2 --synchronized --output_only --config .\configs\tir2rgb_folder.yaml
